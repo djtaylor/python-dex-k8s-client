@@ -1,0 +1,8 @@
+FROM quay.io/dexidp/dex:v2.14.0
+
+RUN mkdir -p /etc/grpc/tls
+
+COPY docker_files/grpc_tls/ /etc/grpc/tls/.
+COPY docker_files/config/dev_v2_14_0.yaml /etc/dex.yaml
+
+ENTRYPOINT /usr/local/bin/dex serve /etc/dex.yaml
