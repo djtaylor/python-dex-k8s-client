@@ -2,10 +2,6 @@ dex_version=v2_14_0
 dex_docker_port=35556
 dex_dockerfile=docker_files/Dockerfile_${dex_version}
 dex_docker_image_name=dex-api-server
-hydra_dockerfile=docker_files/Dockerfile_HydraOID
-hydra_docker_image_name=hydra-oidc-server
-oidc_test_client=test-client
-oidc_test_secret=testsecret
 python_bin=venv/bin/python3
 pip_bin=venv/bin/pip3
 
