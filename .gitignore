@@ -6,3 +6,5 @@ __pycache__
 .pytest_cache
 .eggs
 venv
+debug.sh
+debug.py
