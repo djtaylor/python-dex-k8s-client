@@ -5,41 +5,28 @@ services:
       context: .
       dockerfile: ${DEX_DOCKER_FILE}
     links:
-      - "hydra"
+      - "openldap"
     container_name: ${DEX_DOCKER_IMAGE_NAME}
     ports:
       - "5557:5557"
-  hydra:
-    image: oryd/hydra:v0.11.12
-    environment:
-      - LOG_FORMAT=json
-      - DATABASE_URL=memory
-      - SYSTEM_SECRET=df872hjdfkjdg08972hjdg98245
-      - OAUTH2_SHARE_ERROR_DEBUG=1
-      - OIDC_SUBJECT_TYPES_SUPPORTED=public,pairwise
-      - OIDC_SUBJECT_TYPE_PAIRWISE_SALT=gfsd455se5cr5s
-      - OAUTH2_ISSUER_URL=http://localhost:4444
-      - OAUTH2_CONSENT_URL=http://localhost:3000/consent
-      - OAUTH2_LOGIN_URL=http://localhost:3000/login
-    container_name: "${HYDRA_DOCKER_IMAGE_NAME}"
-    ports:
-      - "4444:4444"
-      - "4445:4445"
-      - "5555:5555"
-    command:
-      serve all --dangerous-force-http
-  hydra_consent:
-    environment:
-      - HYDRA_ADMIN_URL=http://hydra:4445
-    image: oryd/hydra-login-consent-node:v1.0.0-rc.5
-    links:
-      - hydra
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
+      - "5556:5556"
+    restart: on-failure
+    depends_on:
+      - openldap
+  openldap:
 
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost"]
-    #   interval: 5s
-    #   timeout: 10s
-    #   retries: 3
+    build:
+      context: .
+      dockerfile: docker_files/Dockerfile_OpenLDAP
+    container_name: dex-openldap
+    environment:
+      - LDAP_ORGANISATION=MondoCorp
+      - LDAP_DOMAIN=example.org
+      - LDAP_ADMIN_PASSWORD=password
+    ports:
+      - "60389:389"
+    healthcheck:
+      test: ["CMD", "/bin/bash", "/usr/local/bin/openldap_healthcheck.sh"]
+      interval: 5s
+      timeout: 2s
+      retries: 5

@@ -1,4 +1,4 @@
-dex_api_client.egg-info
+dex_k8s_client.egg-info
 build
 dist
 *.pyc
@@ -6,4 +6,5 @@ __pycache__
 .pytest_cache
 .eggs
 venv
-.oidc_client
+debug.sh
+debug.py

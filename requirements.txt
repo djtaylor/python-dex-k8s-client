@@ -3,4 +3,6 @@ grpcio
 grpcio-tools
 passlib
 bcrypt
-jwt
+lxml
+requests
+requests_oauthlib

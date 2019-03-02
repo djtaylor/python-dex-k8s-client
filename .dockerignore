@@ -1,6 +1,6 @@
 venv
 .eggs
 build
-dex_api_client.egg-info
+dex_k8s_client.egg-info
 dist
 __pycache__

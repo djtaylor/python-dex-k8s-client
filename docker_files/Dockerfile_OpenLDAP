@@ -1,0 +1,5 @@
+FROM osixia/openldap:1.2.3
+
+COPY ./docker_files/config/openldap.ldif /container/service/slapd/assets/config/bootstrap/ldif/50-bootstrap.ldif
+COPY ./docker_files/openldap_healthcheck.sh /usr/local/bin/openldap_healthcheck.sh
+RUN chmod +x /usr/local/bin/openldap_healthcheck.sh
