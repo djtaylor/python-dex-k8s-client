@@ -38,9 +38,6 @@ clean:
 healthchecks:
 	docker inspect --format "{{json .State.Health }}" dex-openldap | jq
 
-debug:
-	./debug.sh
-
 test:
 	${python_bin} setup.py test
 
