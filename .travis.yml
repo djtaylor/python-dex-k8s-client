@@ -8,16 +8,9 @@ python:
 services:
   - docker
 
-install: pip install -r requirements.txt
-
 before_script:
   - make build python_bin=python3
   - make run
 
-jobs:
-  include:
-    - stage: "Tests"
-      name: "Unit Tests"
-      script: make test
-    - name: "Integration Tests"
-      script: make test_integration
+install: pip install -r requirements.txt
+script: make test
