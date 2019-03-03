@@ -4,6 +4,7 @@ dex_dockerfile=docker_files/Dockerfile_${dex_version}
 dex_docker_image_name=dex-api-server
 python_bin=venv/bin/python3
 pip_bin=venv/bin/pip3
+nosetests_bin=venv/bin/nosetests
 
 build:
 
@@ -37,8 +38,8 @@ healthchecks:
 test:
 	${python_bin} setup.py test
 
-test_k8s_integration:
-	${python_bin} tests/k8s_integration.py
+test_integration:
+	${nosetests_bin} tests/integration.py
 
 logs:
 	docker logs ${dex_docker_image_name}

@@ -45,8 +45,8 @@ class Dex_K8S_OAuth2_Client(object):
         response = session.get(auth_url, verify=self.verify_ssl)
 
         if not response.status_code == 200:
-            raise Exception('Failed to get authentication URL: {}'.format(
-                response.text
+            raise Exception('Failed to get authentication URL: auth_url="{}", http_error="{}"'.format(
+                auth_url, response.text
             ))
 
         # Get the URL for making POST requests for LDAP auth
@@ -71,6 +71,8 @@ class Dex_K8S_OAuth2_Client(object):
             response.headers['Location']),
             allow_redirects=False,
             verify=self.verify_ssl)
+
+        print(response.text)
 
         return re.search(r"[/]callback[?]code=(\w+)", response.text).group(1)
 

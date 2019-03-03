@@ -1,4 +1,4 @@
-issuer: https://localhost:5556/dex
+issuer: https://localhost:5556
 
 storage:
   type: sqlite3
@@ -27,7 +27,7 @@ logger:
 staticClients:
 - id: auth-app
   redirectURIs:
-  - https://localhost:5556/dex/callback
+  - https://localhost:5556/callback
   name: 'Auth App'
   secret: ZXhhbXBsZS1hcHAtc2VjcmV0
 
@@ -61,3 +61,4 @@ connectors:
 
 oauth2:
   responseTypes: ["code", "token", "id_token"]
+  skipApprovalScreen: true

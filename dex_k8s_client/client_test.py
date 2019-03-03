@@ -15,13 +15,13 @@ def make_fields(method):
     ))
     return getattr(test_fields, method.name)
 
-def make_client(connect=True):
+def make_client(connect_grpc=True):
     """
     Convenience method for generating a test client class.
     """
     settings = make_settings()
     client_object = Dex_K8S_Client(settings.cluster, settings.dex)
-    if connect:
+    if connect_grpc:
         client_object.grpc_connect()
     return client_object
 

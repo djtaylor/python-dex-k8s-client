@@ -14,7 +14,6 @@ services:
     depends_on:
       - openldap
   openldap:
-
     build:
       context: .
       dockerfile: docker_files/Dockerfile_OpenLDAP
@@ -23,8 +22,6 @@ services:
       - LDAP_ORGANISATION=MondoCorp
       - LDAP_DOMAIN=example.org
       - LDAP_ADMIN_PASSWORD=password
-    ports:
-      - "60389:389"
     healthcheck:
       test: ["CMD", "/bin/bash", "/usr/local/bin/openldap_healthcheck.sh"]
       interval: 5s

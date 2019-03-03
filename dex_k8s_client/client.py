@@ -28,14 +28,16 @@ class Dex_K8S_Client(object):
         self.oauth2   = Dex_K8S_OAuth2_Client(self.settings)
 
     def grpc_connect(self):
-        """
-        Open the connection to the Dex gRPC API server.
-        """
+        """ Open the connection to the Dex gRPC API server. """
         self.grpc.connect(self.settings.dex.host, self.settings.dex.grpc_port,
             ca_cert     = self.settings.dex.ca_cert,
             client_cert = self.settings.dex.client_cert,
             client_key  = self.settings.dex.client_key
         )
+
+    def grpc_disconnect(self):
+        """ Close connection to gRPC server """
+        self.grpc.disconnect()
 
     def server_version(self):
         """

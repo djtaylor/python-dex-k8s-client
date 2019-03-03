@@ -5,5 +5,19 @@ python:
   - "3.6"
   - "3.7-dev"
 
+services:
+  - docker
+
 install: pip install -r requirements.txt
-script: python setup.py test
+
+before_script:
+  - make build python_bin=python3
+  - make run
+
+jobs:
+  include:
+    - stage: "Tests"
+      name: "Unit Tests"
+      script: make test
+    - name: "Integration Tests"
+      script: make test_integration

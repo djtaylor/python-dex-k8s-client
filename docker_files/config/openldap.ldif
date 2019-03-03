@@ -8,7 +8,7 @@ objectClass: inetOrgPerson
 sn: doe
 cn: jane
 uid: jane.doe
-mail: janedoe@example.com
+mail: janedoe@example.org
 userpassword: foo
 
 dn: cn=john,ou=users,dc=example,dc=org
@@ -17,7 +17,7 @@ objectClass: inetOrgPerson
 sn: doe
 cn: john
 uid: john.doe
-mail: johndoe@example.com
+mail: johndoe@example.org
 userpassword: bar
 
 # Group definitions.
