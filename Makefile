@@ -19,7 +19,8 @@ build:
 
 run:
 	./docker-compose.sh up -d
-	docker ps
+	docker logs dex-api-server
+	docker logs dex-openldap
 
 setup:
 	virtualenv --python python3 venv
