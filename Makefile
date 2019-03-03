@@ -19,6 +19,7 @@ build:
 
 run:
 	./docker-compose.sh up -d
+	docker ps
 
 setup:
 	virtualenv --python python3 venv
