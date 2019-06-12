@@ -6,3 +6,5 @@ bcrypt
 requests
 requests_oauthlib
 pyyaml
+pyjwt
+cryptography

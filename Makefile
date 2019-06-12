@@ -19,8 +19,6 @@ build:
 
 run:
 	./docker-compose.sh up -d
-	docker logs dex-api-server
-	docker logs dex-openldap
 
 setup:
 	virtualenv --python python3 venv
@@ -40,10 +38,12 @@ healthchecks:
 test: test_unit test_integration
 
 test_unit:
+	@echo "Running unit tests..."
 	${python_bin} setup.py test
 
 test_integration:
-	${nosetests_bin} tests/integration.py
+	@echo "Running integration tests..."
+	${nosetests_bin} -v --nocapture tests/integration.py
 
 logs:
 	docker logs ${dex_docker_image_name}
@@ -54,4 +54,4 @@ logs:
 # NOTE: https://docs.python.org/3.7/distutils/packageindex.html
 release:
 	${python_bin} setup.py sdist bdist_wheel
-	${python_bin} -m twine upload dist/*
+	${python_bin} -m twine upload --skip-existing dist/*

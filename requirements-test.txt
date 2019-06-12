@@ -1,3 +1,4 @@
 parameterized
 nose
 bcrypt
+pyyaml

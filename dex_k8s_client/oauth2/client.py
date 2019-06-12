@@ -3,6 +3,7 @@ from base64 import b64encode
 from requests_oauthlib import OAuth2Session
 from dex_k8s_client.oauth2.parser import Dex_K8S_OAuth2_Parser
 from dex_k8s_client.k8s.kubeconfig import Dex_K8S_KubeConfig
+from dex_k8s_client.oauth2.token import Dex_K8S_OAuth2_Token
 
 class Dex_K8S_OAuth2_Client(object):
     """
@@ -22,9 +23,8 @@ class Dex_K8S_OAuth2_Client(object):
         Initiate an OAuth2 session, get an auth_url and state.
         """
         session = OAuth2Session(client_id,
-            redirect_uri = self.settings.dex.oauth2.redirect_uri,
-            scope        = self.settings.dex.oauth2.scope
-        )
+            redirect_uri=self.settings.dex.oauth2.redirect_uri,
+            scope=self.settings.dex.oauth2.scope)
 
         # Get an authorization URL and state
         auth_url, state = session.authorization_url(self.settings.dex.auth_url,
@@ -67,12 +67,8 @@ class Dex_K8S_OAuth2_Client(object):
             raise Exception('Failed to login: {}'.format(response.text))
 
         # Get the auth code from the approval endpoint
-        response = session.get('{}{}'.format(self.settings.dex.base_url,
-            response.headers['Location']),
-            allow_redirects=False,
-            verify=self.verify_ssl)
-
-        print(response.text)
+        approval_endpoint = '{}{}'.format(self.settings.dex.base_url, response.headers['Location'])
+        response = session.get(approval_endpoint, allow_redirects=False, verify=self.verify_ssl)
 
         return re.search(r"[/]callback[?]code=(\w+)", response.text).group(1)
 
@@ -91,18 +87,19 @@ class Dex_K8S_OAuth2_Client(object):
 
         # Get and return the token
         token = session.fetch_token(self.settings.dex.token_url,
-            code=auth_code,
-            client_secret=client_secret, verify=self.verify_ssl)
-        session.close()
-        return token
+                                    code=auth_code,
+                                    client_secret=client_secret,
+                                    verify=self.verify_ssl)
 
+        return Dex_K8S_OAuth2_Token(token, client_id, session, self.settings)
 
     def get_kubeconfig(self, client_id, client_secret, user_email, user_password):
         """
         Retrieve a user's kubectl config file.
         """
-        token = self.get_token(client_id, client_secret, user_email, user_password)
+        token = self.get_token(client_id, client_secret, user_email, user_password).json()
 
+        # CA certificate
         cluster_ca = None
         with open(self.settings.cluster.ca_cert, 'rb') as f:
             cluster_ca = f.read()

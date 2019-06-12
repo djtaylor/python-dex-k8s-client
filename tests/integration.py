@@ -33,23 +33,51 @@ test_http_args = [
 
 tester = unittest.TestCase('__init__')
 
+token_keys = [
+    'access_token',
+    'token_type',
+    'expires_in',
+    'refresh_token',
+    'id_token',
+    'expires_at'
+]
+
+decoded_token_keys = [
+    'iss',
+    'sub',
+    'aud',
+    'exp',
+    'iat',
+    'at_hash',
+    'email',
+    'email_verified',
+    'name'
+]
+
 def test_http_authorize_client():
-    """ Test getting an OAuth2 authorization URL via HTTP """
+    """ HTTP: Test getting an OAuth2 authorization URL via HTTP """
     dex = make_client(connect_grpc=False)
 
     auth_url, state, session = dex.authorize_client(test_client_id)
-    print(auth_url)
     tester.assertTrue(auth_url.startswith('https://localhost:5556/auth'))
 
 def test_http_client_token():
-    """ Test getting OAuth2 token via HTTP """
+    """ HTTP: Test getting OAuth2 token via HTTP """
     dex = make_client(connect_grpc=False)
 
-    response = dex.get_token(*test_http_args)
-    tester.assertIsInstance(response, dict)
+    token = dex.get_token(*test_http_args).json()
+    tester.assertEqual(list(token.keys()), token_keys)
+
+def test_http_client_token_decode():
+    """ HTTP: Test getting OAuth2 token via HTTP and decoding it """
+    dex = make_client(connect_grpc=False)
+
+    token = dex.get_token(*test_http_args)
+    decoded_token = token.decode()
+    tester.assertEqual(list(decoded_token.keys()), decoded_token_keys)
 
 def test_grpc_create_client():
-    """ Test creating a new Dex client via the gRPC API """
+    """ gRPC: Test creating a new Dex client via the gRPC API """
     dex = make_client()
 
     response = dex.create_client(**client_params)
@@ -70,7 +98,7 @@ def test_grpc_create_client():
     })
 
 def test_grpc_update_client():
-    """ Test updating the client we just created """
+    """ gRPC: Test updating the client we just created """
     dex = make_client()
 
     response = dex.update_client(**{
@@ -82,7 +110,7 @@ def test_grpc_update_client():
     tester.assertEqual(response.json, {})
 
 def test_grpc_update_client_notfound():
-    """ Test attempting to update a non-existant client """
+    """ gRPC: Test attempting to update a non-existant client """
     dex = make_client()
 
     response = dex.update_client(**{
@@ -94,7 +122,7 @@ def test_grpc_update_client_notfound():
     tester.assertEqual(response.json, {'notFound': True})
 
 def test_grpc_create_client_already_exists():
-    """ Test trying to create an already existing client """
+    """ gRPC: Test trying to create an already existing client """
     dex = make_client()
 
     response = dex.create_client(**client_params)
@@ -102,7 +130,7 @@ def test_grpc_create_client_already_exists():
     tester.assertEqual(response.json, {'alreadyExists': True})
 
 def test_grpc_create_password():
-    """ Test creating a password """
+    """ gRPC: Test creating a password """
     dex = make_client()
 
     response = dex.create_password(**password_params)
@@ -110,7 +138,7 @@ def test_grpc_create_password():
     tester.assertEqual(response.json, {})
 
 def test_grpc_update_password():
-    """ Test updating a password """
+    """ gRPC: Test updating a password """
     dex = make_client()
 
     response = dex.update_password(**{
@@ -122,7 +150,7 @@ def test_grpc_update_password():
     tester.assertEqual(response.json, {})
 
 def test_grpc_list_passwords():
-    """ Test listing passwords """
+    """ gRPC: Test listing passwords """
     dex = make_client()
 
     response = dex.list_passwords()
@@ -138,7 +166,7 @@ def test_grpc_list_passwords():
     })
 
 def test_grpc_delete_password():
-    """ Testing deleting a password """
+    """ gRPC: Test deleting a password """
     dex = make_client()
 
     response = dex.delete_password('person@domain.com')
@@ -146,7 +174,7 @@ def test_grpc_delete_password():
     tester.assertEqual(response.json, {})
 
 def test_grpc_delete_client():
-    """ Testing deleting a client via the gRPC API """
+    """ gRPC: Test deleting a client via the gRPC API """
     dex = make_client()
 
     response = dex.delete_client('test-client')
@@ -154,9 +182,21 @@ def test_grpc_delete_client():
     tester.assertEqual(response.json, {})
 
 def test_grpc_delete_client_notfound():
-    """ Test attempting to delete a non-existant client """
+    """ gRPC: Test attempting to delete a non-existant client """
     dex = make_client()
 
     response = dex.delete_client('not-found')
     dex.grpc_disconnect()
     tester.assertEqual(response.json, {'notFound': True})
+
+def test_grpc_list_refresh_tokens():
+    """ gRPC: Test listing refresh tokens """
+    dex = make_client()
+
+    refresh_tokens = dex.list_refresh(*test_http_args)
+
+def test_grpc_revoke_refresh_tokens():
+    """ gRPC: Test revoking refresh tokens """
+    dex = make_client()
+
+    revoked_tokens = dex.revoke_refresh(*test_http_args)

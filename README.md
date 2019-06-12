@@ -10,30 +10,60 @@ This module comes with precompiled protocol buffer bindings for targeted Dex gRP
 The following shows same basic use cases for this module:
 
 ```python3
+import json
+from io import BytesIO
 from dex_k8s_client.k8s.cluster import Dex_K8S_Cluster
 from dex_k8s_client.k8s.connector import Dex_K8S_Connector
 from dex_k8s_client.client import Dex_K8S_Client
 
-# Define your cluster
-cluster = Dex_K8S_Cluster('my-cluster-name', '/my/cluster/ca.crt', 'https://mycluster:8443/api/url')
+# Cluster CA certificate
+cluster_ca_cert = None
+with open('/my/cluster/ca.crt', 'rb') as f:
+  cluster_ca_cert = BytesIO(f.read())
 
-# Define your Dex connection
+# Dex certificates
+dex_client_cert = None
+dex_client_key = None
+dex_ca_cert = None
+
+with open('/my/dex/client.crt', 'rb') as f:
+  dex_client_cert = f.read()
+
+with open('/my/dex/client.key', 'rb') as f:
+  dex_client_key = f.read()
+
+with open('/my/dex/ca.crt', 'rb') as f:
+  dex_ca_cert = f.read()
+
+# Define your cluster
+cluster = Dex_K8S_Cluster('my-cluster-name',
+  ca_cert    = cluster_ca_cert,
+  api_url    = 'https://mycluster:8443/api/url',
+  issuer_url = 'https://mycluster-dex-issuer:5556')
+
+# Define your Dex connection (optional)
 dex_connector = Dex_K8S_Connector(
   host = 'mycluster',
   grpc_port = '5557',
   https_port = '5556',
-  client_cert = '/my/dex/client.crt',
-  client_key = '/my/dex/client.key',
-  ca_cert = '/my/dex/ca.crt',
+  client_cert = dex_client_cert,
+  client_key = dex_client_key,
+  ca_cert = dex_ca_cert,
   issuer_url = 'https://mycluster-dex-issuer:5556',
   version = '2.14.0'
 )
 
 # Create the client
-dex = Dex_K8S_Client(cluster, connector)
+dex = Dex_K8S_Client(cluster, oauth2=dex_oauth2, grpc=dex_grpc)
 
 # Get a token for a user
 token = dex.get_token('client-id', 'client-secret', 'user@domain.com', 'password')
+
+# Get the token JSON
+print(json.dumps(token.json()))
+
+# Decode the token to inspect the payload
+print(json.dumps(token.decode()))
 
 # Get a kubeconfig for a user
 kubeconfig = dex.get_kubeconfig('client-id', 'client-secret', 'user2@domain.com', 'password')
