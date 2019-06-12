@@ -1,4 +1,4 @@
-dex_version=v2_14_0
+dex_version=v2_11_0
 dex_docker_port=35556
 dex_dockerfile=docker_files/Dockerfile_${dex_version}
 dex_docker_image_name=dex-api-server

@@ -1,0 +1,64 @@
+issuer: https://localhost:5556
+
+storage:
+  type: sqlite3
+  config:
+    file: /etc/dex.db
+
+web:
+  https: 0.0.0.0:5556
+  tlsCert: /etc/dex/tls/server.crt
+  tlsKey: /etc/dex/tls/server.key
+
+telemetry:
+  http: 127.0.0.1:5558
+
+grpc:
+  addr: 0.0.0.0:5557
+  tlsCert: /etc/dex/tls/server.crt
+  tlsKey: /etc/dex/tls/server.key
+  tlsClientCA: /etc/dex/tls/ca.crt
+
+enablePasswordDB: true
+
+logger:
+  level: "debug"
+
+staticClients:
+- id: auth-app
+  redirectURIs:
+  - https://localhost:5556/callback
+  name: 'Auth App'
+  secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+
+connectors:
+- type: ldap
+  name: OpenLDAP
+  id: ldap
+  config:
+    host: openldap:389
+    insecureNoSSL: true
+
+    bindDN: cn=admin,dc=example,dc=org
+    bindPW: password
+
+    usernamePrompt: Email Address
+
+    userSearch:
+      baseDN: ou=users,dc=example,dc=org
+      filter: "(objectClass=person)"
+      username: mail
+      idAttr: DN
+      emailAttr: mail
+      nameAttr: cn
+
+    groupSearch:
+      baseDN: ou=groups,dc=example,dc=org
+      filter: "(objectClass=groupOfNames)"
+      userAttr: DN
+      groupAttr: member
+      nameAttr: cn
+
+oauth2:
+  responseTypes: ["code", "token", "id_token"]
+  skipApprovalScreen: true
