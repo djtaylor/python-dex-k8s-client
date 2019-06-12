@@ -22,7 +22,6 @@ run:
 
 setup:
 	virtualenv --python python3 venv
-	chmod +x venv/bin/activate
 
 install:
 	${pip_bin} install -r requirements.txt
