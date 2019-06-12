@@ -1,12 +1,9 @@
-import requests
-from os import getenv
 from grpc_api_client.client import gRPC_API_Client
 
 from dex_k8s_client.settings import Dex_K8S_Settings
 from dex_k8s_client.bindings import Dex_K8S_Bindings
 from dex_k8s_client.oauth2.client import Dex_K8S_OAuth2_Client
-
-DEX_VERSION=getenv('PYTHON_DEX_API_VERSION', '2.14.0')
+from dex_k8s_client.dexidp.dex import DEX_VERSION
 
 class Dex_K8S_Client(object):
     """
@@ -28,14 +25,16 @@ class Dex_K8S_Client(object):
         self.oauth2   = Dex_K8S_OAuth2_Client(self.settings)
 
     def grpc_connect(self):
-        """
-        Open the connection to the Dex gRPC API server.
-        """
+        """ Open the connection to the Dex gRPC API server. """
         self.grpc.connect(self.settings.dex.host, self.settings.dex.grpc_port,
             ca_cert     = self.settings.dex.ca_cert,
             client_cert = self.settings.dex.client_cert,
             client_key  = self.settings.dex.client_key
         )
+
+    def grpc_disconnect(self):
+        """ Close connection to gRPC server """
+        self.grpc.disconnect()
 
     def server_version(self):
         """
@@ -113,14 +112,24 @@ class Dex_K8S_Client(object):
         """
         return self.grpc.api.ListPasswords()
 
-    def list_refresh(self, user_id):
+    def list_refresh(self, client_id, client_secret, user_email, user_password):
         """
         List refresh tokens for a user.
         """
-        return self.grpc.api.ListRefresh(user_id=user_id)
 
-    def revoke_refresh(self, user_id, client_id):
+        # Get the user's token first
+        user_token = self.get_token(
+            client_id, client_secret, user_email, user_password)
+
+        return self.grpc.api.ListRefresh(user_id=user_token.decode()['sub'])
+
+    def revoke_refresh(self, client_id, client_secret, user_email, user_password):
         """
         Revoke a refresh token for a user.
         """
-        return self.grpc.api.RevokeRefresh(user_id=user_id, client_id=client_id)
+
+        # Get the user's token first
+        user_token = self.get_token(
+            client_id, client_secret, user_email, user_password)
+
+        return self.grpc.api.RevokeRefresh(user_id=user_token.decode()['sub'], client_id=client_id)

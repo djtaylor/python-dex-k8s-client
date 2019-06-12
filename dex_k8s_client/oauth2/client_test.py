@@ -138,7 +138,7 @@ class Dex_K8S_OAuth2_Client_Test(unittest.TestCase):
         """ Test getting an OAuth2 token. """
         client = make_client()
         token = client.get_token('test', 'test', 'test@test.com', 'test')
-        self.assertEqual(token, example_token)
+        self.assertEqual(token.json(), example_token)
 
     @mock.patch('dex_k8s_client.oauth2.client.OAuth2Session', new=Mock_OAuth2Session)
     def test_get_kubeconfig(self, *args, **kwargs):

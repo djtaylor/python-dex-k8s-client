@@ -2,12 +2,9 @@ dex_version=v2_14_0
 dex_docker_port=35556
 dex_dockerfile=docker_files/Dockerfile_${dex_version}
 dex_docker_image_name=dex-api-server
-hydra_dockerfile=docker_files/Dockerfile_HydraOID
-hydra_docker_image_name=hydra-oidc-server
-oidc_test_client=test-client
-oidc_test_secret=testsecret
 python_bin=venv/bin/python3
 pip_bin=venv/bin/pip3
+nosetests_bin=venv/bin/nosetests
 
 build:
 
@@ -25,7 +22,6 @@ run:
 
 setup:
 	virtualenv --python python3 venv
-	chmod +x venv/bin/activate
 
 install:
 	${pip_bin} install -r requirements.txt
@@ -38,11 +34,15 @@ clean:
 healthchecks:
 	docker inspect --format "{{json .State.Health }}" dex-openldap | jq
 
-test:
+test: test_unit test_integration
+
+test_unit:
+	@echo "Running unit tests..."
 	${python_bin} setup.py test
 
-test_k8s_integration:
-	${python_bin} tests/k8s_integration.py
+test_integration:
+	@echo "Running integration tests..."
+	${nosetests_bin} -v --nocapture tests/integration.py
 
 logs:
 	docker logs ${dex_docker_image_name}
@@ -53,4 +53,4 @@ logs:
 # NOTE: https://docs.python.org/3.7/distutils/packageindex.html
 release:
 	${python_bin} setup.py sdist bdist_wheel
-	${python_bin} -m twine upload dist/*
+	${python_bin} -m twine upload --skip-existing dist/*
