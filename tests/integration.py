@@ -75,6 +75,8 @@ def test_http_client_token_decode():
     token = dex.get_token(*test_http_args)
     decoded_token = token.decode()
     decoded_keys = list(decoded_token.keys())
+    print(sorted(decoded_keys))
+    print(sorted(decoded_token_keys))
     tester.assertEqual(sorted(decoded_keys), sorted(decoded_token_keys))
 
 def test_grpc_create_client():
