@@ -74,7 +74,8 @@ def test_http_client_token_decode():
 
     token = dex.get_token(*test_http_args)
     decoded_token = token.decode()
-    tester.assertEqual(list(decoded_token.keys()), decoded_token_keys)
+    decoded_keys = list(decoded_token.keys())
+    tester.assertEqual(sorted(decoded_keys), sorted(decoded_token_keys))
 
 def test_grpc_create_client():
     """ gRPC: Test creating a new Dex client via the gRPC API """
