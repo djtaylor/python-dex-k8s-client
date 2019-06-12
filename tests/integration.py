@@ -66,7 +66,9 @@ def test_http_client_token():
     dex = make_client(connect_grpc=False)
 
     token = dex.get_token(*test_http_args).json()
-    tester.assertEqual(list(token.keys()), token_keys)
+    retrieved_token_keys = list(token.keys())
+
+    tester.assertEqual(sorted(retrieved_token_keys), sorted(token_keys))
 
 def test_http_client_token_decode():
     """ HTTP: Test getting OAuth2 token via HTTP and decoding it """
@@ -74,10 +76,8 @@ def test_http_client_token_decode():
 
     token = dex.get_token(*test_http_args)
     decoded_token = token.decode()
-    decoded_keys = list(decoded_token.keys())
-    print(sorted(decoded_keys))
-    print(sorted(decoded_token_keys))
-    tester.assertEqual(sorted(decoded_keys), sorted(decoded_token_keys))
+    retrieved_decoded_keys = list(decoded_token.keys())
+    tester.assertEqual(sorted(retrieved_decoded_keys), sorted(decoded_token_keys))
 
 def test_grpc_create_client():
     """ gRPC: Test creating a new Dex client via the gRPC API """
