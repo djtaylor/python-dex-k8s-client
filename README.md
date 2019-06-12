@@ -76,3 +76,33 @@ To install the module with the precompiled protocol buffer bindings:
 ```sh
 python3 setup.py install
 ```
+
+# Testing
+Tests are broken down into unit tests and integration tests (managed with a Dex and OpenLDAP running on Docker).
+
+### Unit Tests
+To run unit tests:
+```
+$ make test_unit
+```
+
+### Integration Tests
+To run integration tests first make sure you build the required Docker environment:
+
+```
+$ make build
+$ make run
+```
+
+Now that your Docker environment is ready, you can run integration tests:
+
+```
+$ make test_integration
+```
+
+### All Tests
+If you want to run both unit and integration tests back to back, make sure you first follow the steps to get your Docker environment set up:
+
+```
+$ make test
+```
